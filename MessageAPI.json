@@ -1,0 +1,2732 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Message 2.0 API",
+        "version": "1.0.0",
+        "title": "Cloudshare API"
+    },
+    "host": "123.57.47.96:8380",
+    "basePath": "/messaging",
+    "tags": [
+        {
+            "name": "通知消息接口",
+            "description": "本列表描述的是通知消息接口，uri前缀一般是：/api"
+        },
+        {
+            "name": "单聊消息接口",
+            "description": "本列表描述的是单聊消息接口，uri前缀一般是：/api"
+        },
+        {
+            "name": "多媒体聊天附件接口",
+            "description": "本列表描述的是多媒体聊天附件接口，uri前缀一般是：/api"
+        },
+        {
+            "name": "群聊信息接口",
+            "description": "本列表描述的是群聊信息接口，uri前缀一般是：/api"
+        },
+        {
+            "name": "群聊room管理员接口",
+            "description": "本列表描述的是群聊room管理员接口，uri前缀一般是：/adminapi"
+        },
+        {
+            "name": "iOS推送",
+            "description": "本列表描述的是iOS推送，uri前缀一般是：/api"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/api/notifs": {
+            "get": {
+                "tags": [
+                    "通知消息接口"
+                ],
+                "summary": "获取当前用户所有的通知消息",
+                "operationId": "getNotifs",
+                "produces": [
+                    "text/plain;charset=UTF-8"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/NotifsPage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "通知消息接口"
+                ],
+                "summary": "批量标记已读",
+                "operationId": "notifsMarkAsRead",
+                "produces": [
+                    "text/plain;charset=UTF-8"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "ids",
+                        "description": "id list",
+                        "required": "true",
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "readFlag",
+                        "description": "value MUST be true",
+                        "required": "true",
+                        "type": "boolean"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/notifs/search": {
+            "get": {
+                "tags": [
+                    "通知消息接口"
+                ],
+                "summary": "搜索当前用户的通知消息",
+                "operationId": "getNotifs",
+                "produces": [
+                    "text/plain;charset=UTF-8"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2                       
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "description": "",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/NotifsPage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/chat/convs/{oppositeId}/messages": {
+            "get": {
+                "tags": [
+                    "单聊消息接口"
+                ],
+                "summary": "按会话查询消息记录",
+                "description": "按会话查询聊天消息记录，url参数中的oppositeId表示对方id。即：查询的是调用者和oppositeId用户之间的会话。",
+                "operationId": "getChatMsgByOppositeId",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2                       
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "oppositeId",
+                        "in": "path",
+                        "description": "ID of opposite who is in the conversation",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "页码, 表示分页查询的页码，大于等于0，默认值0",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "每页大小, 大于0，默认值10",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "description": "排序方式, 可以有多个字段，以逗号隔开，默认升序，负号表示降序。例如name, -age表示先按照name升序排列，如果name相同，再按照age降序排列。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "过滤返回值中的字段, 只返回指定的字段，例如fields=type, content。如果不指定该参数，则返回所有字段。",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/ChatMessagePage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/chat/convs/unreadDigest": {
+            "get": {
+                "tags": [
+                    "单聊消息接口"
+                ],
+                "summary": "未读会话摘要",
+                "description": "获取所有含有未读消息的会话摘要，包括该会话的未读消息数量，和最后一条未读消息。",
+                "operationId": "getUnreadDigest",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2                       
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/UnreadDigestPage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/chat/convs/{oppositeId}": {
+            "put": {
+                "tags": [
+                    "单聊消息接口"
+                ],
+                "summary": "聊天消息已读反馈",
+                "description": "聊天消息以会话为单位进行已读反馈，此接口的语义是：对于和用户oppositeId的会话，我（调用者）已读到了第readSeq条信息。 （备注：当客户端发送了一条聊天消息，默认更新该会话为全部已读，不需要再通过REST接口更新已读反馈）。",
+                "operationId": "getReadFeedback",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2                       
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "oppositeId",
+                        "description": "ID of opposite who in the conversation",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "readSeq",
+                        "description": "最后已读消息的seq",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "单聊消息接口"
+                ],
+                "summary": "查看单个会话",
+                "description": "查看单个会话",
+                "operationId": "getConvByOppositeId",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "oppositeId",
+                        "in": "path",
+                        "description": "ID of opposite who is in the conversation",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Conversation"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/chat/messages": {
+            "delete": {
+                "tags": [
+                    "单聊消息接口"
+                ],
+                "summary": "批量删除聊天消息",
+                "description": "批量删除聊天消息。",
+                "operationId": "DeleteConvsMessage",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2                       
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "ids",
+                        "description": "id list",
+                        "required": "true",
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }   
+            }
+        },
+        "/api/chat/convs": {
+            "get": {
+                "tags": [
+                    "单聊消息接口"
+                ],
+                "summary": "查看所有会话",
+                "description": "查看所有会话。",
+                "operationId": "getAllConvs",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2                       
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "页码, 表示分页查询的页码，大于等于0，默认值0",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "每页大小, 大于0，默认值10",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "description": "排序方式, 可以有多个字段，以逗号隔开，默认升序，负号表示降序。例如name, -age表示先按照name升序排列，如果name相同，再按照age降序排列。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "过滤返回值中的字段, 只返回指定的字段，例如fields=type, content。如果不指定该参数，则返回所有字段。",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/ConversationPage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }   
+            }
+        },
+        "/api/chat/convs/{oppositeId}/messages/search": {
+            "get": {
+                "tags": [
+                    "单聊消息接口"
+                ],
+                "summary": "搜索聊天记录",
+                "description": "搜索聊天记录",
+                "operationId": "getChatMsgRecord",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2                       
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "oppositeId",
+                        "in": "path",
+                        "description": "ID of opposite who is in the conversation",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "页码, 表示分页查询的页码，大于等于0，默认值0",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "每页大小, 大于0，默认值10",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "description": "排序方式, 可以有多个字段，以逗号隔开，默认升序，负号表示降序。例如name, -age表示先按照name升序排列，如果name相同，再按照age降序排列。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "过滤返回值中的字段, 只返回指定的字段，例如fields=type, content。如果不指定该参数，则返回所有字段。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "keyword",
+                        "description": "搜索关键词",
+                        "required": "true",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "begin",
+                        "description": "开始时间, 大于等于",
+                        "required": "true",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "end",
+                        "description": "结束时间, 可不填，默认当前时间；小于等于",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/ChatMessagePage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/attachments/audio":  {
+            "post": {
+                "tags": [
+                    "多媒体聊天附件接口"
+                ],
+                "summary": "上传语音消息附件",
+                "description": "上传语音消息附件",
+                "operationId": "uploadAudioAttachment",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "file",
+                        "description": "上传的文件, 接受amr、mp3格式，大小限制5M",
+                        "type": "file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Url"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/attachments/image":  {
+            "post": {
+                "tags": [
+                    "多媒体聊天附件接口"
+                ],
+                "summary": "上传图片消息附件",
+                "description": "上传图片消息附件",
+                "operationId": "uploadImageAttachment",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "file",
+                        "description": "上传的文件, 接受格式：jpg、jpeg、png、gif，大小限制5M",
+                        "type": "file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/ImageUrl"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/muc/rooms":  {
+            "post": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "创建room",
+                "description": "创建room",
+                "operationId": "createMucRoom",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "subject",
+                        "description": "主题, 可为空字符串",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "occupantIds",
+                        "description": "成员id列表, 至少2个成员",
+                        "required": true,
+                        "type": "array",
+                        "minItems": 2,
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Room"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "查看加入的所有room",
+                "description": "查看加入的所有room",
+                "operationId": "getAllMucRooms",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "页码, 表示分页查询的页码，大于等于0，默认值0",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "每页大小, 大于0，默认值10",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "description": "排序方式, 可以有多个字段，以逗号隔开，默认升序，负号表示降序。例如name, -age表示先按照name升序排列，如果name相同，再按照age降序排列。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "过滤返回值中的字段, 只返回指定的字段，例如fields=type, content。如果不指定该参数，则返回所有字段。",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/RoomPage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/muc/rooms/{roomId}": {
+            "get": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "查看单个room的信息",
+                "description": "查看单个room的信息",
+                "operationId": "getRoomById",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Room"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "修改room信息",
+                "description": "目前只能修改subject",
+                "operationId": "updateRoomById",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "subject",
+                        "description": "主题",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "删除room",
+                "description": "删除room",
+                "operationId": "deleteRoomById",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/muc/rooms/{roomId}/occupants": {
+            "get": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "查看room成员",
+                "description": "查看room成员",
+                "operationId": "getRoomOccupants",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "页码, 表示分页查询的页码，大于等于0，默认值0",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "每页大小, 大于0，默认值10",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "description": "排序方式, 可以有多个字段，以逗号隔开，默认升序，负号表示降序。例如name, -age表示先按照name升序排列，如果name相同，再按照age降序排列。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "过滤返回值中的字段, 只返回指定的字段，例如fields=type, content。如果不指定该参数，则返回所有字段。",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/OccupantPage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "批量添加room成员",
+                "description": "批量添加room成员",
+                "operationId": "addRoomOccupants",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "occupantIds",
+                        "description": "要添加的成员id",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "批量删除room成员",
+                "description": "批量删除room成员",
+                "operationId": "deleteRoomOccupants",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "occupantIds",
+                        "description": "要删除的成员id",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/muc/rooms/{roomId}/occupants/{userId}": {
+            "delete": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "删除单个room成员/退出room",
+                "description": "删除单个room成员/退出room",
+                "operationId": "deteleRoomOccupantsById",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "description": "用户Id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/muc/rooms/{roomId}/messages": {
+            "get": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "获取群聊消息",
+                "description": "获取一个Room中的消息",
+                "operationId": "getRoomMessage",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "页码, 表示分页查询的页码，大于等于0，默认值0",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "每页大小, 大于0，默认值10",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "description": "排序方式, 可以有多个字段，以逗号隔开，默认升序，负号表示降序。例如name, -age表示先按照name升序排列，如果name相同，再按照age降序排列。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "过滤返回值中的字段, 只返回指定的字段，例如fields=type, content。如果不指定该参数，则返回所有字段。",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/MucMessagePage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/muc/messages/unreadDigest": {
+            "get": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "查看未读群聊消息摘要",
+                "description": "查看未读群聊消息摘要",
+                "operationId": "getMucUnreadDigest",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "页码, 表示分页查询的页码，大于等于0，默认值0",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "每页大小, 大于0，默认值10",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "description": "排序方式, 可以有多个字段，以逗号隔开，默认升序，负号表示降序。例如name, -age表示先按照name升序排列，如果name相同，再按照age降序排列。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "过滤返回值中的字段, 只返回指定的字段，例如fields=type, content。如果不指定该参数，则返回所有字段。",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/UnreadMucMessageDigestPage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/muc/rooms/{roomId}/messages": {
+            "put": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "更新已读标记",
+                "description": "更新已读标记",
+                "operationId": "getMucReadFeedback",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "oppositeId",
+                        "description": "ID of opposite who in the conversation",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "readSeq",
+                        "description": "最后已读消息的seq",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/muc/rooms/{roomId}/messages/search": {
+            "get": {
+                "tags": [
+                    "群聊信息接口"
+                ],
+                "summary": "搜索room聊天记录",
+                "description": "搜索room聊天记录",
+                "operationId": "getMucMsgRecord",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "roomId",
+                        "in": "path",
+                        "description": "房间Id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "页码, 表示分页查询的页码，大于等于0，默认值0",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "每页大小, 大于0，默认值10",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "description": "排序方式, 可以有多个字段，以逗号隔开，默认升序，负号表示降序。例如name, -age表示先按照name升序排列，如果name相同，再按照age降序排列。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "过滤返回值中的字段, 只返回指定的字段，例如fields=type, content。如果不指定该参数，则返回所有字段。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "keyword",
+                        "description": "搜索关键词",
+                        "required": "true",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "begin",
+                        "description": "开始时间, 大于等于",
+                        "required": "true",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "end",
+                        "description": "结束时间, 可不填，默认当前时间；小于等于",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/MucMessagePage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/adminapi/muc/rooms": {
+            "post": {
+                "tags": [
+                    "群聊room管理员接口"
+                ],
+                "summary": "创建room",
+                "description": "创建room",
+                "operationId": "adminCreateMucRoom",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-msg-secret-key",
+                        "description": "key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "subject",
+                        "in": "query",
+                        "description": "主题, 可为空字符串  ",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "ownerId",
+                        "description": "群主id",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "occupantIds",
+                        "description": "成员id列表, 如果不需要额外成员：occupantIds=空",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "special",
+                        "description": "默认为true",
+                        "type": "boolean",
+                        "default": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Room"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+
+            },
+            "get": {
+                "tags": [
+                    "群聊room管理员接口"
+                ],
+                "summary": "查看所有room",
+                "description": "查看所有room",
+                "operationId": "adminGetAllMucRooms",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-msg-secret-key",
+                        "description": "key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "页码, 表示分页查询的页码，大于等于0，默认值0",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "每页大小, 大于0，默认值10",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "description": "排序方式, 可以有多个字段，以逗号隔开，默认升序，负号表示降序。例如name, -age表示先按照name升序排列，如果name相同，再按照age降序排列。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "过滤返回值中的字段, 只返回指定的字段，例如fields=type, content。如果不指定该参数，则返回所有字段。",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/RoomPage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+
+            }
+        },
+        "/adminapi/muc/rooms/{roomId}": {
+            "get": {
+                "tags": [
+                    "群聊room管理员接口"
+                ],
+                "summary": "查看单个room的信息",
+                "description": "查看单个room的信息",
+                "operationId": "adminGetRoomById",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-msg-secret-key",
+                        "description": "key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Room"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "群聊room管理员接口"
+                ],
+                "summary": "修改Room信息",
+                "description": "修改Room信息",
+                "operationId": "adminUpdateRoomById",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-msg-secret-key",
+                        "description": "key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "ownerId",
+                        "description": "新的群主Id, 必须在该群当中, 并且不能是原来的群主, 此参数和subject只能二选一",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "subject",
+                        "description": "主题， 此参数和ownerId只能二选一",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "群聊room管理员接口"
+                ],
+                "summary": "删除room",
+                "description": "删除room",
+                "operationId": "adminDeleteRoomById",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-msg-secret-key",
+                        "description": "key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/adminapi/muc/rooms/{roomId}/occupants": {
+            "get": {
+                "tags": [
+                    "群聊room管理员接口"
+                ],
+                "summary": "查看room成员",
+                "description": "查看room成员",
+                "operationId": "adminGetRoomOccupants",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-msg-secret-key",
+                        "description": "key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "页码, 表示分页查询的页码，大于等于0，默认值0",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "每页大小, 大于0，默认值10",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "description": "排序方式, 可以有多个字段，以逗号隔开，默认升序，负号表示降序。例如name, -age表示先按照name升序排列，如果name相同，再按照age降序排列。",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "过滤返回值中的字段, 只返回指定的字段，例如fields=type, content。如果不指定该参数，则返回所有字段。",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/OccupantPage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "群聊room管理员接口"
+                ],
+                "summary": "批量添加room成员",
+                "description": "批量添加room成员",
+                "operationId": "adminAddRoomOccupants",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-msg-secret-key",
+                        "description": "key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "occupantIds",
+                        "description": "要添加的成员id",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "群聊room管理员接口"
+                ],
+                "summary": "批量删除room成员",
+                "description": "批量删除room成员",
+                "operationId": "adminDeleteRoomOccupants",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "description": "ID of room",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "occupantIds",
+                        "description": "要删除的成员id",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/iosdevices": {
+            "get": {
+                "tags": [
+                    "iOS推送"
+                ],
+                "summary": "查看用户的所有iOS设备",
+                "description": "查看用户的所有iOS设备",
+                "operationId": "getiOSDevices",
+                "produces": [
+                    "text/plain;charset=UTF-8"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/IOSDevicePage"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "iOS推送"
+                ],
+                "summary": "添加iOS设备",
+                "description": "添加iOS设备",
+                "operationId": "addiOSDevices",
+                "produces": [
+                    "text/plain;charset=UTF-8"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "deviceToken",
+                        "description": "设备推送token, 长度必须为64位",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "description",
+                        "description": "设备描述信息",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/iosdevices/{deviceToken}": {
+            "delete": {
+                "tags": [
+                    "iOS推送"
+                ],
+                "summary": "删除设备",
+                "description": "删除设备",
+                "operationId": "deleteiOSDevices",
+                "produces": [
+                    "text/plain;charset=UTF-8"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "x-tenant-id",
+                        "description": "Tenant id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 2
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-ticket",
+                        "description": "Unique identity for each user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "deviceToken",
+                        "description": "设备推送token, 长度必须为64位",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Status": {
+            "type": "object",
+            "properties": {
+                "statusCode":{
+                    "type": "integer",
+                    "format": "int32"
+                },
+                    "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "NotifsPage": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pageSize": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalSize": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/NotifMessage"
+                    }
+                }
+            }
+        },
+        "NotifMessage": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "ts": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "receiver": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "readFlag": {
+                    "type": "boolean"
+                },
+                "attributes": {
+                    "type": "string"
+                }
+            }
+        },
+        "ChatMessagePage": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "description": "页码",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "description": "总页数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalSize": {
+                    "description": "总元素个数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entries": {
+                    "description": "具体元素集合",
+                    "schema": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/ChatMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "ChatMessage": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "type": {
+                    "description": "消息类型",
+                    "enum": [ "TEXT", "AUDIO", "PIC", "FILE", "GEO" ]
+                },
+                "content": {
+                    "description": "内容, 小于1024字符。基本原则:1.不包含冗余信息（sendname等）和不需要持久化的信息（matchTag）2.尽量不使用json格式（因为大量的序列化和反序列化会对服务器造成较大压力）",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "ts": {
+                    "description": "时间戳",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "sender": {
+                    "description": "发送人id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "receiver": {
+                    "description": "接收人id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "seq": {
+                    "description": "会话序列",
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "UnreadDigestPage": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "description": "页码",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "description": "总页数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalSize": {
+                    "description": "总元素个数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entries": {
+                    "description": "具体元素集合",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UnreadDigest"
+                    }
+                }
+            }
+        },
+        "UnreadDigest": {
+            "type": "object",
+            "properties": {
+                "userId": {
+                    "description": "调用者id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "oppositeId": {
+                    "description": "对方id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "unreadCount": {
+                    "description": "未读消息数",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "lastMessage": {
+                    "description": "会话的最后一条信息",
+                    "$ref": "#/definitions/ChatMessage"
+                }
+            }
+        },
+        "ConversationPage": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "description": "页码",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "description": "总页数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalSize": {
+                    "description": "总元素个数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entries": {
+                    "description": "具体元素集合",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Conversation"
+                    }
+                }
+            }
+        },
+        "Conversation": {
+            "type": "object",
+            "properties": {
+                "userId": {
+                    "description": "调用者id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "oppositeId": {
+                    "description": "对方id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "readSeq": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "maxSeq": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "updateTime": {
+                    "description": "最后更新时间",
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "AudioUrl": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "description": "下载地址",
+                    "type": "string"
+                }
+            }
+        },
+        "ImageUrl": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "description": "下载地址",
+                    "type": "string"
+                },
+                "thumbnailUrl": {
+                    "description": "缩略图下载地址",
+                    "type": "string"
+                }
+            }
+        },
+        "Room": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Room id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "subject": {
+                    "description": "主题",
+                    "type": "string"
+                },
+                "createTime": {
+                    "description": "创建时间",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "owner": {
+                    "description": "群主 id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "special": {
+                    "description": "如果为true，表示该room和工作空间绑定，客户端不能修改",
+                    "type": "boolean"
+                }
+            }
+        },
+        "RoomPage": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "description": "页码",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "description": "总页数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalSize": {
+                    "description": "总元素个数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entries": {
+                    "description": "具体元素集合",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Room"
+                    }
+                }
+            }
+        },
+        "OccupantPage": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "description": "页码",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "description": "总页数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalSize": {
+                    "description": "总元素个数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entries": {
+                    "description": "具体元素集合",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Occupant"
+                    }
+                }
+            }
+        },
+        "Occupant": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Room id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "userId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "role": {
+                    "description": "角色, Moderator（管理员）或Participant（普通成员）",
+                    "type": "string"
+                },
+                "createTime": {
+                    "description": "创建时间",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "readSeq": {
+                    "description": "该成员在room中已读的消息序列号",
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "MucMessagePage": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pageSize": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalSize": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/MucMessage"
+                    }
+                }
+            }
+        },
+        "MucMessage": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "type": {
+                    "description": "消息类型",
+                    "enum": [ "TEXT", "AUDIO", "PIC", "FILE", "GEO" ]
+                },
+                "content": {
+                    "description": "内容, 小于1024字符。基本原则:1.不包含冗余信息（sendname等）和不需要持久化的信息（matchTag）2.尽量不使用json格式（因为大量的序列化和反序列化会对服务器造成较大压力）",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "ts": {
+                    "description": "时间戳",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "sender": {
+                    "description": "发送人id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "roomId": {
+                    "description": "房间id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "seq": {
+                    "description": "会话序列",
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "UnreadMucMessageDigestPage": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "description": "页码",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "description": "总页数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalSize": {
+                    "description": "总元素个数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entries": {
+                    "description": "具体元素集合",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UnreadMucMessageDigest"
+                    }
+                }
+            }
+        },
+        "UnreadDigest": {
+            "type": "object",
+            "properties": {
+                "roomId": {
+                    "description": "房间id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "unreadCount": {
+                    "description": "未读消息数",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "lastMessage": {
+                    "description": "会话的最后一条信息",
+                    "$ref": "#/definitions/MucMessage"
+                }
+            }
+        },
+        "IOSDevicePage": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "description": "页码",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "description": "总页数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalSize": {
+                    "description": "总元素个数",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entries": {
+                    "description": "具体元素集合",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IOSDevice"
+                    }
+                }
+            }
+        },
+        "IOSDevice": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "id",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "deviceToken": {
+                    "description": "设备推送token, 必须为64位",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "设备描述信息",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
+
+
+
