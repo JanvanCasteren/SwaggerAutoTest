@@ -3,16 +3,18 @@ var frisby = require('frisby');
 var request = require('sync-request');
 
 // sd = Swagger Definition
-var sd = JSON.parse(fs.readFileSync('petstore.json', 'UTF-8'));
+var sd = JSON.parse(fs.readFileSync('lite.json', 'UTF-8'));
+var config = JSON.parse(fs.readFileSync('config.js', 'UTF-8'));
 
 // get attributes from swagger defintion
-var	paths = sd.paths;
-var host = sd.host;
-var basePath = sd.basePath;
-var tags = sd.tags;
-var schemes = sd.schemes;
-var title = sd.info.title;
+var	paths = sd['paths'];
+var host = sd['host'];
+var basePath = sd['basePath'];
+var tags = sd['tags'];
+var schemes = sd['schemes'];
+var title = sd['info']['title'];
 if (title == undefined) title = "unknown";
+var definitions = sd['definitions'];
 
 
 // login to get ticket
@@ -41,55 +43,102 @@ frisby.globalSetup({
 });
 
 describe(title, function(){
-	for (var path in paths){
+	for (path in paths){
 		var pathObj = paths[path];
-		for (var method in pathObj){
+		for (method in pathObj){
 			var methodObj = pathObj[method];
 			var url = schemes + '://' + host + basePath + path;
+			console.log(basePath);
 			var responses = methodObj['responses'];
+			var parameters = methodObj['parameters'];
 			
-			var definition = findDefinition(responses);
-			if (definition != undefined) console.log(definition);
+			var JSONTypes = findDefinition(responses);
+			var requestUrl = getRequestUrl(url, parameters);
+
+			var frisbyExec = 'frisby.create("' + methodObj['summary'] + '").' + 
+			        method + '("' + requestUrl + '")' + 
+			        '.expectStatus(200)' + 
+			        '.expectJSONTypes({' + JSONTypes + '})' +
+			        // '.inspectJSON()' +  
+			        '.toss()';
 			
-			if (method == 'get'){
-					frisby.create(methodObj['summary'])
-			        .get(url)
-			        .expectStatus(200)
-			        .toss();
-			} else if (method == 'post'){
-				frisby.create(methodObj['summary'])
-			        .post(url)
-			        .expectStatus(200)
-			        .toss();
-			} else if (method == 'delete'){
-				frisby.create(methodObj['summary'])
-			        .delete(url)
-			        .expectStatus(200)
-			        .toss();
-			} else if (method == 'put'){
-				frisby.create(methodObj['summary'])
-			        .put(url)
-			        .expectStatus(200)
-			        .toss();
-			} 
+			console.log(frisbyExec);
+
+
+			eval(frisbyExec);
 		}
-
-
 	} 
 });
 
 // find detailed object in definition
 function findDefinition(responses){
+
 	var definition;
 
 	if (responses['200'] == undefined) return;
 	
-	if (responses['200']['type'] == 'array'){
+	if (responses['200']['schema']['type'] == 'array'){
 		definition = responses['200']['schema']['items']['$ref'];
 	} else {
 		definition = responses['200']['schema']['$ref'];
 	}
-	return definition;
+	
+	if (definition != undefined){
+		definition = definition.replace('#/definitions/', '');
+	}
+
+
+	if (definitions[definition]['type'] == 'object'){
+		var JSONTypes = getJSONTypes(definitions[definition]['properties']);
+	}
+
+	return JSONTypes;
 }
 
-// get definition name success!!!
+// get expectJSONTypes
+function getJSONTypes(properties){
+	var JSONTypes = '';
+	// concatenate string which matches format of JSONTypes in Frisby
+	for (i in properties){
+		JSONTypes += i + ':';
+		JSONTypes += properties[i]['type'] + ',';
+	}
+
+	JSONTypes = JSONTypes.replace(/integer/g, 'Number').replace(/string/g, 'String').replace(/array/g, 'Array').replace(/boolean/g, 'Boolean').replace(/[,]$/, '');
+
+	return JSONTypes;
+}
+
+// get request url with parameters
+function getRequestUrl(url, parameters){
+
+    // handle parameters in path
+    // get variable array in path
+    var placeholders = url.match(/\{.*?\}/g, '');
+
+    if (placeholders != null){
+        // replace variable in url by value from config.json
+        for (var i = 0; i < placeholders.length; i++) {
+            var placeholder = placeholders[i].replace(/[\{\}]/g, '');
+            url = url.replace(placeholders[i], config[placeholder]);
+        }
+    }
+
+    // handle parameters in query
+    var paraStr = '';
+    for (var i = 0; i < parameters.length; i++) {
+        var name = parameters[i]['name'];
+        var paraType = parameters[i]['in'];
+
+        // ignore parameters which have been handled
+        if (name == 'x-ticket' || name == 'x-tenant-id' || paraType == 'path') continue;
+
+        paraStr += name + '=' + config[name] + '&';
+    }
+
+    if (paraStr != ''){
+        url = url + '?' + paraStr.replace(/[&]$/, '');
+    }
+
+    return url;
+}
