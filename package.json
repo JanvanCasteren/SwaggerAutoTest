@@ -11,6 +11,7 @@
   "dependencies": {
     "frisby": "^0.8.5",
     "sync-request": "^2.1.0",
-    "traverse": "^0.6.6"
+    "traverse": "^0.6.6",
+    "urlencode": "^1.1.0"
   }
 }

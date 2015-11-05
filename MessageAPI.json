@@ -656,7 +656,7 @@
                 "responses": {
                     "200": {
                         "schema": {
-                            "$ref": "#/definitions/Url"
+                            "$ref": "#/definitions/AudioUrl"
                         }
                     },
                     "404": {
@@ -2254,11 +2254,9 @@
                 },
                 "entries": {
                     "description": "具体元素集合",
-                    "schema": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/definitions/ChatMessage"
-                        }
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ChatMessage"
                     }
                 }
             }
