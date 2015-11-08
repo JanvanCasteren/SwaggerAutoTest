@@ -4,8 +4,8 @@ var request = require('sync-request');
 var urlencode = require('urlencode');
 
 // sd = Swagger Definition
-var sd = JSON.parse(fs.readFileSync('lite.json', 'UTF-8'));
-// var sd = JSON.parse(fs.readFileSync('MessageAPI.json', 'UTF-8'));
+// var sd = JSON.parse(fs.readFileSync('lite.json', 'UTF-8'));
+var sd = JSON.parse(fs.readFileSync('MessageAPI.json', 'UTF-8'));
 var config = JSON.parse(fs.readFileSync('config.js', 'UTF-8'));
 
 // get attributes from swagger defintion
@@ -18,13 +18,21 @@ var title = sd['info']['title'];
 if (title == undefined) title = "unknown";
 var definitions = sd['definitions'];
 
+// get definition from '$ref'
+String.prototype.getDefinition = function(){
+    return this.replace('#/definitions/', '');
+}
 
+// replace types to conform to frisbyjs format.
+String.prototype.replaceTypes = function(){
+    return this.replace(/integer/g, 'Number').replace(/(undefined|string)/g, 'String').replace(/array/g, 'Array').replace(/boolean/g, 'Boolean').replace(/[,]$/, '');
+}
 
 // login to get ticket
-var username = config['username'],
-    password = config['password'],
-    url = "http://123.56.40.165/service/api/v2/login?x-tenant-id=2",
-    auth = "Basic " + new Buffer(username + ":" + password).toString("base64");
+var username = config['username'];
+var password = config['password'];
+var url = "http://123.56.40.165/service/api/v2/login?x-tenant-id=2";
+var auth = "Basic " + new Buffer(username + ":" + password).toString("base64");
 
 var res = request('POST', url, {
     'headers': {
@@ -44,6 +52,9 @@ frisby.globalSetup({
     }
 });
 
+
+var expectJSONTypes;
+
 describe(title, function(){
 	for (path in paths){
 		var pathObj = paths[path];
@@ -52,20 +63,18 @@ describe(title, function(){
 			var url = schemes + '://' + host + basePath + path;
 			var responses = methodObj['responses'];
 			var parameters = methodObj['parameters'];
-			
-			var JSONTypes = handleResponses(responses);
+			expectJSONTypes = '';
+			handleResponses(responses);
 			var requestUrl = getRequestUrl(url, parameters);
 
 			var frisbyExec = 'frisby.create("' + methodObj['summary'] + '").' + 
 			        method + '("' + requestUrl + '")' + 
 			        '.expectStatus(200)' + 
-			        '.expectJSONTypes(' + JSONTypes + ')' +
+			        expectJSONTypes + 
 			        // '.inspectJSON()' +  
 			        '.toss()';
-			
-			console.log(frisbyExec);
 
-
+            console.log(frisbyExec);
 			eval(frisbyExec);
 		}
 	} 
@@ -75,31 +84,54 @@ describe(title, function(){
 function handleResponses(responses){
 
 	var definition;
-	var JSONTypes;
-
+    // todo
 	if (responses['200']['schema']['type'] == 'array'){
 		definition = responses['200']['schema']['items']['$ref'];
 	} else {
 		definition = responses['200']['schema']['$ref'].replace('#/definitions/', '');
-		JSONTypes = '{' + getJSONTypes(definitions[definition]['properties']) + '}';
+		return handleProperties(definitions[definition]['properties'], 'responses');
 	}
+}   
 
-	return JSONTypes;
+function handleProperties(properties, type, name){
+    var JSONTypes = getJSONTypes(properties);
+
+    if (type == 'responses'){
+        expectJSONTypes += '.expectJSONTypes({' + JSONTypes + '})';
+    } else if (type == 'array'){
+        expectJSONTypes += '.expectJSONTypes("' + name +'.*", {' + JSONTypes + '})';
+    } else if (type == 'object'){
+        console.log(getJSONTypes(properties));
+        expectJSONTypes = expectJSONTypes.replace(new RegExp(name + ':Object', 'g'), name + ':{' + getJSONTypes(properties) + '}');
+    }
+
+    for (i in properties){
+        if (properties[i]['type'] == 'array'){
+            var definition = properties[i]['items']['$ref'].getDefinition();
+            handleProperties(definitions[definition]['properties'], 'array', i);
+        } else if (properties[i]['$ref']){
+            var definition = properties[i]['$ref'].getDefinition();
+            handleProperties(definitions[definition]['properties'], 'object', i);
+        }
+    }
 }
 
-// get expectJSONTypes
+
+// traverse properties to get JOSNTypes
 function getJSONTypes(properties){
-	var JSONTypes = '';
-	// concatenate string which matches format of JSONTypes in Frisby
-	for (i in properties){
-		JSONTypes += i + ':';
-		JSONTypes += properties[i]['type'] + ',';
-	}
-
-	JSONTypes = JSONTypes.replace(/integer/g, 'Number').replace(/string/g, 'String').replace(/array/g, 'Array').replace(/boolean/g, 'Boolean').replace(/[,]$/, '');
-
-	return JSONTypes;
+    var JSONTypes = '';
+    for (i in properties){
+        JSONTypes += i + ':';
+        if (properties[i]['$ref']){
+            JSONTypes += 'Object' + ',';
+        } else {
+            JSONTypes += properties[i]['type'] + ',';
+        }
+    }
+    JSONTypes = JSONTypes.replaceTypes();
+    return JSONTypes;
 }
+
 
 // get request url with parameters
 function getRequestUrl(url, parameters){
@@ -125,7 +157,7 @@ function getRequestUrl(url, parameters){
 
         // ignore parameters which have been handled
         if (name == 'x-ticket' || name == 'x-tenant-id' || paraType == 'path') continue;
-        // ignore parameters not required and not in config.js%2C
+        // ignore parameters not required and not in config.js
         if (!required && !config['name']) continue;
 
         // urlencode query parameters. eg ids=222,225 must be transformed to ids=222%2C225
