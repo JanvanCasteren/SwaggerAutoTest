@@ -9,7 +9,7 @@ var sd = JSON.parse(fs.readFileSync('MessageAPI.json', 'UTF-8'));
 var config = JSON.parse(fs.readFileSync('config.js', 'UTF-8'));
 
 // get attributes from swagger defintion
-var	paths = sd['paths'];
+var paths = sd['paths'];
 var host = sd['host'];
 var basePath = sd['basePath'];
 var tags = sd['tags'];
@@ -49,7 +49,8 @@ frisby.globalSetup({
             'x-ticket': ticket,
             'x-tenant-id': 2
         }
-    }
+    },
+    timeout: 10000
 });
 
 
@@ -93,6 +94,7 @@ function handleResponses(responses){
 	}
 }   
 
+// handle different situations of properties
 function handleProperties(properties, type, name){
     var JSONTypes = getJSONTypes(properties);
 
@@ -161,9 +163,9 @@ function getRequestUrl(url, parameters){
         if (!required && !config['name']) continue;
 
         // urlencode query parameters. eg ids=222,225 must be transformed to ids=222%2C225
-        if (name == 'ids') config[name] = urlencode(config[name]);
-
+        if (name == 'ids' || name == 'occupantIds') config[name] = urlencode(config[name]);
         paraStr += name + '=' + config[name] + '&';
+        config[name] = urlencode.decode(config[name]);
     }
 
     if (paraStr != ''){

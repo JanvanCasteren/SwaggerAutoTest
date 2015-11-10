@@ -1721,7 +1721,7 @@
                 "tags": [
                     "群聊room管理员接口"
                 ],
-                "summary": "修改Room信息",
+                "summary": "修改room信息",
                 "description": "修改Room信息",
                 "operationId": "adminUpdateRoomById",
                 "produces": [
